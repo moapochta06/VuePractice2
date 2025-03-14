@@ -1,7 +1,7 @@
 Vue.component('cardForm', {
      template: `
         <form class="card-form" @submit.prevent="onSubmit">
-            <div v-for="error in errors">{{ error }}</div>
+            <div class="errors" v-for="error in errors">{{ error }}</div>
             <input type="text" v-model="note" placeholder="Напишите заметку">
             <div v-for="(task,index) in tasks" :key="index">
                 <input type="text" v-model="task.text" :placeholder="'Введите задачу'">
@@ -19,18 +19,24 @@ Vue.component('cardForm', {
             createTask: false
         }
      },
+     computed: {
+        emptyTasks() {
+            return this.tasks.filter(task => task.text.trim() == '');
+        }
+    },
      methods:{
         onSubmit(){
             this.errors = [];
-            if(this.note && this.tasks.length >=3){
+            if(this.note && this.tasks.length >=3 && this.emptyTasks.length == 0){
                 let cardData = {
                     note: this.note,
                     tasks: this.tasks
                 }
                 this.cardSubmitted(cardData); 
             } else {
-                if(!this.note) this.errors.push("Ввеите заметку")
-                if(this.tasks.length < 3) this.errors.push("Введите хотябы 3 задачи")
+                if (this.emptyTasks.length > 0) this.errors.push("Задачи не могут быть пустыми!")
+                if(!this.note) this.errors.push("Ввеите заметку!")
+                if(this.tasks.length < 3) this.errors.push("Введите хотя бы 3 задачи!")
             }
         },
         cardSubmitted(cardData){
@@ -38,15 +44,16 @@ Vue.component('cardForm', {
         },
         
         addTask() {
+            this.errors= []
             if (this.tasks.length < 5) {
                 const newTask = { text: '', completed: false };
-                if (this.tasks.every(task => task.text.trim() !== '')) {
+                if (this.emptyTasks.length == 0) {
                     this.tasks.push(newTask);
                 } else {
-                    this.errors.push("Задачи не могут быть пустыми");
+                    this.errors.push("Задачи не могут быть пустыми!");
                 }
             } else {
-                this.errors.push("Задач должно быть не больше 5");
+                this.errors.push("Задач должно быть не больше 5!");
             }
         },
 
