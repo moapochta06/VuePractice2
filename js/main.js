@@ -71,22 +71,36 @@ Vue.component('card', {
             <h3>{{ card.note }}</h3>
             <ul>
                 <li v-for="(task, index) in card.tasks" :key="index" :class="{ 'completed': task.completed }" class="task-item">
-                    <input type="checkbox" v-model="task.completed" @change="checkProgress">
+                    <input type="checkbox" v-model="task.completed" @change="checkProgress"  >
                     {{ task.text }}
                 </li>
             </ul>
+            <p v-if="card.completionDate">Завершено: {{ formatDate }}</p>
         </div>
     `,
+    computed: {
+        formatDate() {
+                const nowDate = new Date(this.card.completionDate);
+                return nowDate.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                });
+        }
+    },
     methods: {
         checkProgress() {
             const completedTasks = this.card.tasks.filter(task => task.completed).length;
             const allTasks = this.card.tasks.length;
             const progress = (completedTasks / allTasks) * 100;
-
+            const date = Date.now();
             if (progress >= 50 && progress < 100) {
                 this.$emit('move-card', { card: this.card, targetColumn: 'column2' }); // переместить в колонку 2
             } else if (progress === 100) {
-                this.$emit('move-card', { card: this.card, targetColumn: 'column3' }); // переместить в колонку 3
+                card.disabled = true; 
+                this.$emit('move-card', { card: this.card, targetColumn: 'column3', cardDate:date}); // переместить в колонку 3
             }
         }
     }
@@ -171,7 +185,7 @@ Vue.component('board', {
         addCardToColumn1(cardData) {
             this.column1Cards.unshift(cardData); // добавление карточки в первую колонку
         },
-        moveCard({ card, targetColumn }) {
+        moveCard({ card, targetColumn, cardDate }) {
             // удаление карточки из текущей колонки
             this.column1Cards = this.column1Cards.filter(c => c !== card);
             this.column2Cards = this.column2Cards.filter(c => c !== card);
@@ -181,6 +195,7 @@ Vue.component('board', {
             if (targetColumn === 'column2') {
                 this.column2Cards.push(card);
             } else if (targetColumn === 'column3') {
+                card.completionDate = cardDate;
                 this.column3Cards.push(card);
             }
         }
