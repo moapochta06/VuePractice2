@@ -7,6 +7,10 @@ body {
     color:#0a0a1b;
     margin: 0px;
 }
+h2{
+    margin: 0 ;
+    color: #0076cb;
+}
 h3{
     margin-top: 0;
     padding-bottom: 15px;
@@ -21,7 +25,7 @@ ul{
     gap: 30px;
     padding: 40px 80px ;
   }
-.board{
+.column{
     width: 30%;
     min-height: 90vh;
     max-height: fit-content;
@@ -59,7 +63,7 @@ button {
     background: #fcfbfb;
     border-radius: 30px;
     box-shadow: 4px 3px 6px rgba(87, 87, 87, 0.404);
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 input {
