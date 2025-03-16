@@ -3,6 +3,7 @@ Vue.component('cardForm', {
         <form class="card-form" @submit.prevent="onSubmit">
             <div class="errors" v-for="error in errors">{{ error }}</div>
             <input type="text" v-model="note" placeholder="Напишите заметку">
+            <p>Задачи</p>
             <div v-for="(task, index) in tasks" :key="index">
                 <input type="text" v-model="task.text" :placeholder="'Введите задачу'">
             </div>
@@ -64,6 +65,10 @@ Vue.component('card', {
         card: {
             type: Object,
             required: true
+        },
+        isBlocked: {
+            type: Boolean,
+            default: false
         }
     },
     template: `
@@ -71,7 +76,7 @@ Vue.component('card', {
             <h3>{{ card.note }}</h3>
             <ul>
                 <li v-for="(task, index) in card.tasks" :key="index" :class="{ 'completed': task.completed }" class="task-item">
-                    <input type="checkbox" v-model="task.completed" @change="checkProgress"  >
+                    <input type="checkbox" v-model="task.completed" @change="checkProgress" :disabled="isBlocked" >
                     {{ task.text }}
                 </li>
             </ul>
@@ -97,10 +102,11 @@ Vue.component('card', {
             const progress = (completedTasks / allTasks) * 100;
             const date = Date.now();
             if (progress >= 50 && progress < 100) {
-                this.$emit('move-card', { card: this.card, targetColumn: 'column2' }); // переместить в колонку 2
+                this.$emit('move-card', { card: this.card, targetColumn: 'column2'}); // переместить в колонку 2
+             
             } else if (progress === 100) {
-                card.disabled = true; 
-                this.$emit('move-card', { card: this.card, targetColumn: 'column3', cardDate:date}); // переместить в колонку 3
+                this.$emit('move-card', { card: this.card, targetColumn: 'column3', cardDate: date}); // переместить в колонку 3
+            
             }
         }
     }
@@ -108,6 +114,10 @@ Vue.component('card', {
 
 Vue.component('column', {
     props: {
+        isBlocked: {
+            type: Boolean,
+            default: false
+        },
         title: {
             type: String,
             required: true
@@ -124,9 +134,9 @@ Vue.component('column', {
     template: `
         <div class="column">
             <h2>{{ title }}</h2>
-            <button v-if="title == ''" @click="showForm">Создать заметку +</button>
+            <button v-if="title == ''" @click="showForm" :disabled="isBlocked">Создать заметку +</button>
             <card-form v-if="isFormVisible" @card-submitted="addCard"></card-form>
-            <card v-for="(card, index) in cards" :key="index" :card="card" @move-card="moveCard"></card>
+            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked"  @move-card="moveCard"></card>
         </div>
     `,
     data() {
@@ -147,7 +157,7 @@ Vue.component('column', {
             }
         },
         moveCard(moveData) {
-            this.$emit('move-card', moveData); // сообщение нужно переместить карточку
+                this.$emit('move-card', moveData); // сообщение нужно переместить карточку
         }
     }
 });
@@ -159,12 +169,13 @@ Vue.component('board', {
                 title="" 
                 :maxCards="3" 
                 :cards="column1Cards" 
+                :isBlocked="isBlocked" 
                 @added-card="addCardToColumn1"
                 @move-card="moveCard"
             ></column>
             <column 
                 title="В работе" 
-                :maxCards="5" 
+                :maxCards="2" 
                 :cards="column2Cards" 
                 @move-card="moveCard"
             ></column>
@@ -178,7 +189,8 @@ Vue.component('board', {
         return {
             column1Cards: [],
             column2Cards: [],
-            column3Cards: []
+            column3Cards: [],
+            isBlocked: false,
         }
     },
     methods: {
@@ -186,19 +198,25 @@ Vue.component('board', {
             this.column1Cards.unshift(cardData); // добавление карточки в первую колонку
         },
         moveCard({ card, targetColumn, cardDate }) {
+            if (this.column2Cards.length >= 2 && targetColumn == 'column2') {
+                this.isBlocked = true;
+                return; // запрет перемещения
+            }else {
+                this.isBlocked = false
+            }
             // удаление карточки из текущей колонки
             this.column1Cards = this.column1Cards.filter(c => c !== card);
             this.column2Cards = this.column2Cards.filter(c => c !== card);
-            this.column3Cards = this.column3Cards.filter(c => c !== card);
 
             // добавление в целевую колонку
-            if (targetColumn === 'column2') {
+            if (targetColumn == 'column2') {
                 this.column2Cards.push(card);
-            } else if (targetColumn === 'column3') {
+            } else if (targetColumn == 'column3') {
                 card.completionDate = cardDate;
+                card.disabled = true; 
                 this.column3Cards.push(card);
             }
-        }
+        },
     }
 });
 

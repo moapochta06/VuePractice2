@@ -78,6 +78,7 @@ input {
     border-radius: 10px;
     color: #000000;
 }
+
 .completed{
     text-decoration: line-through;
     color: #888;
