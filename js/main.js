@@ -136,7 +136,7 @@ Vue.component('column', {
             <h2>{{ title }}</h2>
             <button v-if="title == ''" @click="showForm" :disabled="isBlocked">Создать заметку +</button>
             <card-form v-if="isFormVisible" @card-submitted="addCard"></card-form>
-            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked"  @move-card="moveCard"></card>
+            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked" @move-card="moveCard"></card>
         </div>
     `,
     data() {
@@ -196,6 +196,7 @@ Vue.component('board', {
     methods: {
         addCardToColumn1(cardData) {
             this.column1Cards.unshift(cardData); // добавление карточки в первую колонку
+            this.saveData();
         },
         moveCard({ card, targetColumn, cardDate }) {
             if (this.column2Cards.length >= 2 && targetColumn == 'column2') {
@@ -216,7 +217,28 @@ Vue.component('board', {
                 card.disabled = true; 
                 this.column3Cards.push(card);
             }
+            this.saveData();
         },
+        saveData() {
+            const data = {
+                column1Cards: this.column1Cards,
+                column2Cards: this.column2Cards,
+                column3Cards: this.column3Cards
+            };
+            localStorage.setItem('boardData', JSON.stringify(data));
+        },
+        loadData() {
+            const data = localStorage.getItem('boardData');
+            if (data) {
+                const parsedData = JSON.parse(data);
+                this.column1Cards = parsedData.column1Cards;
+                this.column2Cards = parsedData.column2Cards;
+                this.column3Cards = parsedData.column3Cards;
+            }
+        }
+    },
+    created() {
+        this.loadData(); // загружаем данные при создании компонента
     }
 });
 
