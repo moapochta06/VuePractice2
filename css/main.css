@@ -1,9 +1,10 @@
+@import 'fonts/tahoma.ttf';
 *{
     box-sizing: border-box;
 
 }
 body {
-    font-family: tahoma, serif;
+    font-family: 'Tahoma', serif;
     color:#0a0a1b;
     margin: 0px;
 }
