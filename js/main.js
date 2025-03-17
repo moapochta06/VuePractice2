@@ -69,6 +69,10 @@ Vue.component('card', {
         isBlocked: {
             type: Boolean,
             default: false
+        },
+        isCompleted: {
+            type: Boolean,
+            default: false
         }
     },
     template: `
@@ -76,7 +80,7 @@ Vue.component('card', {
             <h3>{{ card.note }}</h3>
             <ul>
                 <li v-for="(task, index) in card.tasks" :key="index" :class="{ 'completed': task.completed }" class="task-item">
-                    <input type="checkbox" v-model="task.completed" @change="checkProgress" :disabled="isBlocked" >
+                    <input type="checkbox" v-model="task.completed" @change="checkProgress" :disabled="isBlocked||isCompleted" >
                     {{ task.text }}
                 </li>
             </ul>
@@ -136,7 +140,7 @@ Vue.component('column', {
             <h2>{{ title }}</h2>
             <button v-if="title == ''" @click="showForm" :disabled="isBlocked">Создать заметку +</button>
             <card-form v-if="isFormVisible" @card-submitted="addCard"></card-form>
-            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked" @move-card="moveCard"></card>
+            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked" :isCompleted="title == 'Завершено'"  @move-card="moveCard"></card>
         </div>
     `,
     data() {
@@ -175,7 +179,7 @@ Vue.component('board', {
             ></column>
             <column 
                 title="В работе" 
-                :maxCards="2" 
+                :maxCards="5" 
                 :cards="column2Cards" 
                 @move-card="moveCard"
             ></column>
@@ -199,7 +203,7 @@ Vue.component('board', {
             this.saveData();
         },
         moveCard({ card, targetColumn, cardDate }) {
-            if (this.column2Cards.length >= 2 && targetColumn == 'column2') {
+            if (this.column2Cards.length >= 5 && targetColumn == 'column2') {
                 this.isBlocked = true;
                 return; // запрет перемещения
             }else {
