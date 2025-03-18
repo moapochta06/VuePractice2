@@ -1,4 +1,4 @@
-@import 'fonts/tahoma.ttf';
+@import 'font.css';
 *{
     box-sizing: border-box;
 
@@ -6,7 +6,7 @@
 body {
     font-family: 'Tahoma', serif;
     color:#0a0a1b;
-    margin: 0px;
+    margin: 0;
 }
 h2{
     margin: 0 ;
@@ -20,6 +20,9 @@ h3{
 ul{
     list-style: none;
     padding-left: 25px;
+}
+p{
+    margin-top: 0;
 }
 
 .columns-container {
@@ -50,7 +53,7 @@ button {
     height: 40px;
     width: 100%;
     font-size: 14px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 .btn-save{
     background: #7ed027;
@@ -84,12 +87,23 @@ input {
     text-decoration: line-through;
     color: #888;
 }
+
+.priority{
+    margin-bottom: 17px;
+}
+.priority label{
+    color: #ff1130;
+}
+.priority label input[type="checkbox"]{
+    display: inline;
+    vertical-align: middle;
+}
 .task-item {
    display: flex;
    align-items: center;
    margin-bottom: 13px;
 }
-.task-item input[type="checkbox"] {
+input[type="checkbox"] {
     display: block;
     margin: 0 10px 0 0;
     width: 25px;

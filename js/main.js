@@ -8,6 +8,12 @@ Vue.component('cardForm', {
                 <input type="text" v-model="task.text" :placeholder="'Введите задачу'">
             </div>
             <button type="button" @click="addTask">Добавить задачу +</button>
+            <div class="priority">
+                <label>
+                    <input type="checkbox" v-model="isPriority">
+                    Установить высокий приоритет
+                </label>
+            </div>
             <button type="submit" class="btn-save">Сохранить</button>
         </form>
     `,
@@ -19,6 +25,7 @@ Vue.component('cardForm', {
                 { text:''},
                 { text:''}
             ],
+            isPriority: false,
             errors: []
         }
     },
@@ -33,7 +40,8 @@ Vue.component('cardForm', {
             if (this.note && this.tasks.length >= 3 && this.emptyTasks.length == 0) {
                 let cardData = {
                     note: this.note,
-                    tasks: this.tasks
+                    tasks: this.tasks,
+                    priority: this.isPriority 
                 }
                 this.$emit('card-submitted', cardData);
             } else {
@@ -78,6 +86,7 @@ Vue.component('card', {
     template: `
         <div class="card">
             <h3>{{ card.note }}</h3>
+            <p v-if="card.priority">Высокий приоритет</p>
             <ul>
                 <li v-for="(task, index) in card.tasks" :key="index" :class="{ 'completed': task.completed }" class="task-item">
                     <input type="checkbox" v-model="task.completed" @change="checkProgress" :disabled="isBlocked||isCompleted" >
@@ -140,7 +149,7 @@ Vue.component('column', {
             <h2>{{ title }}</h2>
             <button v-if="title == ''" @click="showForm" :disabled="isBlocked">Создать заметку +</button>
             <card-form v-if="isFormVisible" @card-submitted="addCard"></card-form>
-            <card v-for="(card, index) in cards" :key="index" :card="card" :isBlocked="isBlocked" :isCompleted="title == 'Завершено'"  @move-card="moveCard"></card>
+            <card v-for="(card, index) in cards" :key="card.note + index"  :card="card" :isBlocked="isBlocked" :isCompleted="title == 'Завершено'"  @move-card="moveCard"></card>
         </div>
     `,
     data() {
@@ -198,8 +207,21 @@ Vue.component('board', {
         }
     },
     methods: {
+        addCardWithPriority(cardsArray, cardData) {
+            if (cardData.priority) {
+                cardsArray.unshift(cardData);
+            } else {
+                // Если карточка без приоритета, находим индекс первой неприоритетной задачи
+                const firstNonPriorityIndex = cardsArray.findIndex(card => !card.priority);
+                if (firstNonPriorityIndex === -1) {
+                    cardsArray.push(cardData);
+                } else {
+                    cardsArray.splice(firstNonPriorityIndex, 0, cardData);
+                }
+            }
+        },
         addCardToColumn1(cardData) {
-            this.column1Cards.unshift(cardData); // добавление карточки в первую колонку
+            this.addCardWithPriority(this.column1Cards, cardData); // добавление карточки в первую колонку
             this.saveData();
         },
         moveCard({ card, targetColumn, cardDate }) {
@@ -215,11 +237,11 @@ Vue.component('board', {
 
             // добавление в целевую колонку
             if (targetColumn == 'column2') {
-                this.column2Cards.push(card);
+                this.addCardWithPriority(this.column2Cards, card);
             } else if (targetColumn == 'column3') {
                 card.completionDate = cardDate;
                 card.disabled = true; 
-                this.column3Cards.push(card);
+                this.addCardWithPriority(this.column3Cards, card);
             }
             this.saveData();
         },
