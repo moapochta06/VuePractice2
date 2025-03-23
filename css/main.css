@@ -1,36 +1,48 @@
 @import 'font.css';
-*{
+
+* {
     box-sizing: border-box;
 
 }
+
 body {
     font-family: 'Tahoma', serif;
-    color:#0a0a1b;
+    color: #0a0a1b;
     margin: 0;
 }
-h2{
-    margin: 0 ;
+
+h2 {
+    margin: 0;
     color: #0076cb;
 }
-h3{
+
+h3 {
     margin-top: 0;
     padding-bottom: 15px;
-    border-bottom: #c7c7c7 0.4px solid ;
+    border-bottom: #c7c7c7 0.4px solid;
 }
-ul{
+
+ul {
     list-style: none;
     padding-left: 25px;
 }
-p{
+
+p {
     margin-top: 0;
 }
 
 .columns-container {
+    width: auto;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 30px;
-    padding: 40px 80px ;
-  }
-.column{
+    padding-top: 40px;
+    /* padding: 40px 80px; */
+}
+
+.column {
+    min-width: 300px;
     width: 30%;
     min-height: 90vh;
     max-height: fit-content;
@@ -38,6 +50,7 @@ p{
     border-radius: 30px;
     padding: 40px;
 }
+
 .color-box {
     width: 40px;
     height: 40px;
@@ -55,14 +68,16 @@ button {
     font-size: 14px;
     margin-bottom: 15px;
 }
-.btn-save{
+
+.btn-save {
     background: #7ed027;
 }
 
 .disabledButton {
     background-color: #d8d8d8;
 }
-.card{
+
+.card {
     height: fit-content;
     padding: 30px;
     background: #fcfbfb;
@@ -83,26 +98,30 @@ input {
     color: #000000;
 }
 
-.completed{
+.completed {
     text-decoration: line-through;
     color: #888;
 }
 
-.priority{
+.priority {
     margin-bottom: 17px;
 }
-.priority label{
+
+.priority label {
     color: #ff1130;
 }
-.priority label input[type="checkbox"]{
+
+.priority label input[type="checkbox"] {
     display: inline;
     vertical-align: middle;
 }
+
 .task-item {
-   display: flex;
-   align-items: center;
-   margin-bottom: 13px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 13px;
 }
+
 input[type="checkbox"] {
     display: block;
     margin: 0 10px 0 0;
@@ -110,7 +129,7 @@ input[type="checkbox"] {
     height: 25px;
 }
 
-.errors{
+.errors {
     margin-bottom: 10px;
     color: #ff1130;
 }
